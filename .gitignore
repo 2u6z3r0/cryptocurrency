@@ -25,3 +25,4 @@ tmp/**
 .python-version
 launch.json
 settings.json
+.vscode
