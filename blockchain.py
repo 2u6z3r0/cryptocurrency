@@ -30,9 +30,12 @@ def add_transaction(receiver, sender=owner, amount=1.0):
     transaction = {'sender':sender, 'receiver': receiver, 'amount':amount}
     open_transactions.append(transaction)    
 
+def hash_block(block):
+    return '-'.join[str(block[key]) for key in block]
+
 def block_mine():
     last_block = blockchain[-1]
-    hashed_last_block = '-'.join([str(last_block[key]) for key in last_block])
+    hashed_last_block = hash_block(last_block)
     print(hashed_last_block)
     
     block = {
@@ -49,19 +52,12 @@ def validate_blockchain():
         True - if blockchain is valid
         False - if blockchian is not valid
     """
-    block_index = 0
-    is_valid = True
-    for block in blockchain:
-        if block_index == 0:
-            block_index += 1 
+    for (index,block) in enumerate(blockchain):
+        if index == 0:
             continue
-        elif block[0] == blockchain[block_index -1]:
-            is_valid = True
-        else:
-            is_valid = False
-            break 
-        block_index += 1
-    return is_valid
+        elif block['previous_block_hash'] != hash_block(blockchain[index - 1]):
+            return False
+    return True
     
 def get_transaction_value():
     """ Get transaction information(recipient, amount) from the user.
@@ -114,7 +110,7 @@ while True:
             blockchain[0] = [2]
     else:
         print("Invalid choice")
-    # if not validate_blockchain():
-    #     print('Invalid Chain!!!')
-    #     break
+    if not validate_blockchain():
+        print('Invalid Chain!!!')
+        break
 
