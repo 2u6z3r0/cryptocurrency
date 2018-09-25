@@ -31,7 +31,7 @@ def add_transaction(receiver, sender=owner, amount=1.0):
     open_transactions.append(transaction)    
 
 def hash_block(block):
-    return '-'.join[str(block[key]) for key in block]
+    return '-'.join([str(block[key]) for key in block])
 
 def block_mine():
     last_block = blockchain[-1]
@@ -107,7 +107,11 @@ while True:
         break
     elif user_choice == '5':
         if len(blockchain) > 0:
-            blockchain[0] = [2]
+            blockchain[0] = {
+                'previous_block_hash':'',
+                'index':0,
+                'transaction': {'sender': 'Sai', 'receiver': 'Max', 'amount':100}
+            }
     else:
         print("Invalid choice")
     if not validate_blockchain():
