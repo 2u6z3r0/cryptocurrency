@@ -1,4 +1,4 @@
-# simple simulator of blcokchain using lists
+# Blockchain and crypto currency implementation in python3
 
 genesis_block = {
     'previous_block_hash':'',
@@ -32,9 +32,7 @@ def add_transaction(receiver, sender=owner, amount=1.0):
 
 def block_mine():
     last_block = blockchain[-1]
-    hashed_last_block=''
-    for key in last_block:
-        hashed_last_block += str(last_block[key])
+    hashed_last_block = '-'.join([str(last_block[key]) for key in last_block])
     print(hashed_last_block)
     
     block = {
