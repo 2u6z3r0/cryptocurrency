@@ -3,7 +3,7 @@
 genesis_block = {
     'previous_block_hash':'',
     'index':0,
-    'transaction': []
+    'transactions': []
 }
 blockchain = [genesis_block]
 open_transactions=[]
@@ -44,7 +44,7 @@ def block_mine():
     block = {
         'previous_block_hash':hashed_last_block,
         'index':len(blockchain),
-        'transaction': open_transactions
+        'transactions': open_transactions
     }
     blockchain.append(block)
     return True
@@ -62,7 +62,23 @@ def validate_blockchain():
         elif block['previous_block_hash'] != hash_block(blockchain[index - 1]):
             return False
     return True
+
+
+def get_balance(participant):
+    tx_sender = [[  tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
+    amount_sent = 0
+    for tx in tx_sender:
+        if len(tx) > 0:
+            amount_sent += tx[0]
+
+    tx_recipient = [[ tx['amount'] for tx in block['transactions'] if tx['receiver'] == participant ] for block in blockchain]
+    amount_recieved = 0
+    for tx in tx_recipient:
+        if len(tx) > 0:
+            amount_recieved += tx[0]
     
+    return amount_recieved - amount_sent
+
 def get_transaction_value():
     """ Get transaction information(recipient, amount) from the user.
 
@@ -122,6 +138,7 @@ while True:
         break
     else:
         print("Invalid choice")
+    print("Your balance : {}".format(get_balance('Max')))
     if not validate_blockchain():
         print('Invalid Chain!!!')
         break
