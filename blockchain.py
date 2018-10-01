@@ -8,6 +8,7 @@ genesis_block = {
 blockchain = [genesis_block]
 open_transactions=[]
 owner = 'Max'
+participants={"Max"}
 
 def get_last_blockchain_value():
     """ Return last block value from the blockchain.
@@ -29,6 +30,8 @@ def add_transaction(receiver, sender=owner, amount=1.0):
     """
     transaction = {'sender':sender, 'receiver': receiver, 'amount':amount}
     open_transactions.append(transaction)    
+    participants.add(sender)
+    participants.add(receiver)
 
 def hash_block(block):
     return '-'.join([str(block[key]) for key in block])
@@ -91,8 +94,9 @@ while True:
     print("1. Add a transaction value")
     print("2. Mine a block")
     print("3. Print blockchian")
-    print("4. Quit")
+    print("4. Print participants")
     print("5. Hack the planet")
+    print("6. Quit")
     user_choice = get_user_choice()
     if user_choice == '1':
         tx_data = get_transaction_value()
@@ -104,7 +108,7 @@ while True:
     elif user_choice == '3':
         print_blockchain()
     elif user_choice == '4':
-        break
+        print(participants)
     elif user_choice == '5':
         if len(blockchain) > 0:
             blockchain[0] = {
@@ -112,6 +116,8 @@ while True:
                 'index':0,
                 'transaction': {'sender': 'Sai', 'receiver': 'Max', 'amount':100}
             }
+    elif user_choice == '6':
+        break
     else:
         print("Invalid choice")
     if not validate_blockchain():
