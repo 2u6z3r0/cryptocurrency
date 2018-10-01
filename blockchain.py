@@ -47,6 +47,7 @@ def block_mine():
         'transaction': open_transactions
     }
     blockchain.append(block)
+    return True
 
 def validate_blockchain():
     """ Validates the blockchain.
@@ -104,7 +105,8 @@ while True:
         add_transaction(recipient, amount=amount)
         print(open_transactions)
     elif user_choice == '2':
-        block_mine()
+        if block_mine():
+            open_transactions = []
     elif user_choice == '3':
         print_blockchain()
     elif user_choice == '4':
