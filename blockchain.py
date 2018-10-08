@@ -87,8 +87,8 @@ def validate_blockchain():
 
 def get_balance(participant):
     tx_sender = [[  tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
-    open_tx_sender = [ tx['amount'] for tx in open_transactions if tx['sender'] == participant ]
-    tx_sender.append(open_tx_sender)
+    open_tx_sender = [ [tx['amount']] for tx in open_transactions if tx['sender'] == participant ]
+    tx_sender.extend(open_tx_sender)
     amount_sent = 0
     for tx in tx_sender: 
         if len(tx) > 0:
