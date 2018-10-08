@@ -1,5 +1,7 @@
 # Blockchain and crypto currency implementation in python3
 
+MINING_REWARD = 10
+
 genesis_block = {
     'previous_block_hash':'',
     'index':0,
@@ -40,7 +42,12 @@ def block_mine():
     last_block = blockchain[-1]
     hashed_last_block = hash_block(last_block)
     print(hashed_last_block)
-    
+    reward_transaction = {
+        'sender' : 'MINING',
+        'receiver' : owner,
+        'amount' : MINING_REWARD
+    }
+    open_transactions.append(reward_transaction)
     block = {
         'previous_block_hash':hashed_last_block,
         'index':len(blockchain),
