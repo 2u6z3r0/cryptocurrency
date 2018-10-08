@@ -31,9 +31,13 @@ def add_transaction(receiver, sender=owner, amount=1.0):
         amount: the amount of coins sent with transaction(default=1.0)
     """
     transaction = {'sender':sender, 'receiver': receiver, 'amount':amount}
-    open_transactions.append(transaction)    
-    participants.add(sender)
-    participants.add(receiver)
+    if verify_transaction(transaction):
+        open_transactions.append(transaction)    
+        participants.add(sender)
+        participants.add(receiver)
+        return True
+    else:
+        return False 
 
 def hash_block(block):
     return '-'.join([str(block[key]) for key in block])
@@ -56,6 +60,16 @@ def block_mine():
     blockchain.append(block)
     return True
 
+def verify_transaction(transaction):
+    """ Validates the transcaction.
+
+    Retuns:
+        True - if sender have enough money to send
+        False - if sender dont have enough money to send
+    """
+    sender_balance = get_balance(transaction['sender'])
+    return sender_balance >= transaction['amount']
+
 def validate_blockchain():
     """ Validates the blockchain.
 
@@ -73,14 +87,16 @@ def validate_blockchain():
 
 def get_balance(participant):
     tx_sender = [[  tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
+    open_tx_sender = [ tx['amount'] for tx in open_transactions if tx['sender'] == participant ]
+    tx_sender.append(open_tx_sender)
     amount_sent = 0
-    for tx in tx_sender:
+    for tx in tx_sender: 
         if len(tx) > 0:
             amount_sent += tx[0]
 
     tx_recipient = [[ tx['amount'] for tx in block['transactions'] if tx['receiver'] == participant ] for block in blockchain]
     amount_recieved = 0
-    for tx in tx_recipient:
+    for tx in tx_recipient: 
         if len(tx) > 0:
             amount_recieved += tx[0]
     
@@ -125,8 +141,10 @@ while True:
     if user_choice == '1':
         tx_data = get_transaction_value()
         recipient, amount = tx_data
-        add_transaction(recipient, amount=amount)
-        print(open_transactions)
+        if add_transaction(recipient, amount=amount):
+            print("Transaction added.")
+        else:
+            print("Transaction failed, insufficient balance!!")
     elif user_choice == '2':
         if block_mine():
             open_transactions = []
