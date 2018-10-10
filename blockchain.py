@@ -164,7 +164,7 @@ while True:
         break
     else:
         print("Invalid choice")
-    print("Your balance : {}".format(get_balance('Max')))
+    print("Balance of {} is : {:6.2f}".format('Max',get_balance('Max')))
     if not validate_blockchain():
         print('Invalid Chain!!!')
         break
