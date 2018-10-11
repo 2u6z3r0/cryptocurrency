@@ -1,5 +1,7 @@
 # Blockchain and crypto currency implementation in python3
 import functools
+import hashlib
+import json
 
 MINING_REWARD = 10
 
@@ -41,7 +43,7 @@ def add_transaction(receiver, sender=owner, amount=1.0):
         return False 
 
 def hash_block(block):
-    return '-'.join([str(block[key]) for key in block])
+    return hashlib.sha256(json.dumps(block).encode()).hexdigest()
 
 def block_mine():
     last_block = blockchain[-1]
@@ -91,7 +93,6 @@ def get_balance(participant):
     tx_sender = [[  tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
     open_tx_sender = [ tx['amount'] for tx in open_transactions if tx['sender'] == participant ]
     tx_sender.append(open_tx_sender)
-    print(tx_sender)
     amount_sent = functools.reduce(lambda tx_sum, tx_amt: tx_sum + sum(tx_amt) if len(tx_amt) > 0 else tx_sum,tx_sender, 0)
     # amount_sent = 0
     # for tx in tx_sender: 
