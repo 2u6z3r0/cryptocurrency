@@ -8,7 +8,7 @@ MINING_REWARD = 10
 genesis_block = {
     'previous_block_hash':'',
     'index':0,
-    'transactions': []
+    'transactions': [],
     'proof': 10
 }
 blockchain = [genesis_block]
@@ -47,15 +47,16 @@ def hash_block(block):
     return hashlib.sha256(json.dumps(block).encode()).hexdigest()
 
 def valid_proof(transactions, last_block_hash, proof):
-    guess = (str(transactions) + str(last_hash) + str(proof)).encode()
+    guess = (str(transactions) + str(last_block_hash) + str(proof)).encode()
     guess_hash = hashlib.sha256(guess).hexdigest()
+    print(guess_hash)
     return guess_hash[:2] == '00'
 
 def proof_of_work():
     last_block = blockchain[-1]
     last_block_hash = hash_block(last_block)
     proof = 0
-    while valid_proof(open_transactions, last_block_hash, proof):
+    while not valid_proof(open_transactions, last_block_hash, proof):
         proof += 1
     return proof
 
@@ -74,7 +75,7 @@ def block_mine():
     block = {
         'previous_block_hash':hashed_last_block,
         'index':len(blockchain),
-        'transactions': copied_transactions
+        'transactions': copied_transactions,
         'proof' : proof
     }
     blockchain.append(block)
@@ -100,7 +101,10 @@ def validate_blockchain():
     for (index,block) in enumerate(blockchain):
         if index == 0:
             continue
-        elif block['previous_block_hash'] != hash_block(blockchain[index - 1]):
+        if block['previous_block_hash'] != hash_block(blockchain[index - 1]):
+            return False
+        if not valid_proof(block['transactions'][:-1], block['previous_block_hash'], block['proof']):
+            print("Invlaid proof of work")
             return False
     return True
 
@@ -185,8 +189,8 @@ while True:
         break
     else:
         print("Invalid choice")
-    print("Balance of {} is : {:6.2f}".format('Max',get_balance('Max')))
     if not validate_blockchain():
         print('Invalid Chain!!!')
         break
+    print("Balance of {} is : {:6.2f}".format('Max',get_balance('Max')))
 
