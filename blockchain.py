@@ -1,7 +1,6 @@
 # Blockchain and crypto currency implementation in python3
 import functools
-import hashlib
-import json
+from hash_util import hash_block, hash_string_256
 from collections import OrderedDict
 
 MINING_REWARD = 10
@@ -47,12 +46,10 @@ def add_transaction(receiver, sender=owner, amount=1.0):
     else:
         return False 
 
-def hash_block(block):
-    return hashlib.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest()
 
 def valid_proof(transactions, last_block_hash, proof):
     guess = (str(transactions) + str(last_block_hash) + str(proof)).encode()
-    guess_hash = hashlib.sha256(guess).hexdigest()
+    guess_hash = hash_string_256(guess)
     print(guess_hash)
     return guess_hash[:2] == '00'
 
