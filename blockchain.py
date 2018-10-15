@@ -2,6 +2,7 @@
 import functools
 import hashlib
 import json
+from collections import OrderedDict
 
 MINING_REWARD = 10
 
@@ -34,7 +35,10 @@ def add_transaction(receiver, sender=owner, amount=1.0):
         receiver: receiver of the coins
         amount: the amount of coins sent with transaction(default=1.0)
     """
-    transaction = {'sender':sender, 'receiver': receiver, 'amount':amount}
+    # transaction = {'sender':sender, 'receiver': receiver, 'amount':amount}
+    # Using orderDict instead of Dictionary to make sure hashing wont affect, 
+    # by default Dict is unordered, may result in diff hash for the same set of records
+    transaction = OrderedDict([('sender', sender), ('receiver', receiver), ('amount', amount)])
     if verify_transaction(transaction):
         open_transactions.append(transaction)    
         participants.add(sender)
@@ -44,7 +48,7 @@ def add_transaction(receiver, sender=owner, amount=1.0):
         return False 
 
 def hash_block(block):
-    return hashlib.sha256(json.dumps(block).encode()).hexdigest()
+    return hashlib.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest()
 
 def valid_proof(transactions, last_block_hash, proof):
     guess = (str(transactions) + str(last_block_hash) + str(proof)).encode()
@@ -64,11 +68,12 @@ def block_mine():
     last_block = blockchain[-1]
     hashed_last_block = hash_block(last_block)
     print(hashed_last_block)
-    reward_transaction = {
-        'sender' : 'MINING',
-        'receiver' : owner,
-        'amount' : MINING_REWARD
-    }
+    # reward_transaction = {
+    #     'sender' : 'MINING',
+    #     'receiver' : owner,
+    #     'amount' : MINING_REWARD
+    # }
+    reward_transaction = OrderedDict(([('sender','MINING'), ('receiver', owner), ('amount', MINING_REWARD)]))
     copied_transactions = open_transactions[:]
     copied_transactions.append(reward_transaction)
     proof = proof_of_work()
