@@ -2,6 +2,7 @@
 import functools
 from hash_util import hash_block, hash_string_256
 from collections import OrderedDict
+import json
 
 MINING_REWARD = 10
 
@@ -15,6 +16,16 @@ blockchain = [genesis_block]
 open_transactions=[]
 owner = 'Max'
 participants={"Max"}
+
+def load_data():
+    with open('Blockchain_data.txt', 'r') as file:
+        file_content = file.readlines()
+        global blockchain 
+        global open_transactions
+        blockchain = json.loads(file_content[0][:-1])
+        open_transactions = json.loads(file_content[1])
+
+load_data()
 
 def get_last_blockchain_value():
     """ Return last block value from the blockchain.
@@ -42,6 +53,7 @@ def add_transaction(receiver, sender=owner, amount=1.0):
         open_transactions.append(transaction)    
         participants.add(sender)
         participants.add(receiver)
+        save_data()
         return True
     else:
         return False 
@@ -60,6 +72,12 @@ def proof_of_work():
     while not valid_proof(open_transactions, last_block_hash, proof):
         proof += 1
     return proof
+
+def save_data():
+    with open('Blockchain_data.txt', 'w') as file:
+        file.write(json.dumps(blockchain))
+        file.write("\n")
+        file.write(json.dumps(open_transactions))
 
 def block_mine():
     last_block = blockchain[-1]
@@ -173,13 +191,18 @@ while True:
             print("Transaction added.")
         else:
             print("Transaction failed, insufficient balance!!")
+        
     elif user_choice == '2':
         if block_mine():
             open_transactions = []
+            save_data()
+
     elif user_choice == '3':
         print_blockchain()
+
     elif user_choice == '4':
         print(participants)
+
     elif user_choice == '5':
         if len(blockchain) > 0:
             blockchain[0] = {
@@ -187,12 +210,16 @@ while True:
                 'index':0,
                 'transaction': {'sender': 'Sai', 'receiver': 'Max', 'amount':100}
             }
+
     elif user_choice == '6':
         break
+
     else:
         print("Invalid choice")
+
     if not validate_blockchain():
         print('Invalid Chain!!!')
         break
+
     print("Balance of {} is : {:6.2f}".format('Max',get_balance('Max')))
 
