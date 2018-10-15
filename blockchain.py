@@ -23,6 +23,17 @@ def load_data():
         global blockchain 
         global open_transactions
         blockchain = json.loads(file_content[0][:-1])
+        #using update_blockchain to convert transactions to OderedDict to make sure hash comparison wont fail
+        updated_blockchain = []
+        for block in blockchain:
+            updated_block ={
+                'previous_block_hash': block['previous_block_hash'],
+                'index':block['index'],
+                'transactions': [ OrderedDict([('sender', tx['sender']), ('receiver', tx['receiver']), ('amount', tx['amount'])]) for tx in block['transactions']],
+                'proof': block['proof']
+            }
+            updated_blockchain.append(updated_block)
+        blockchain = updated_blockchain
         open_transactions = json.loads(file_content[1])
 
 load_data()
@@ -62,7 +73,7 @@ def add_transaction(receiver, sender=owner, amount=1.0):
 def valid_proof(transactions, last_block_hash, proof):
     guess = (str(transactions) + str(last_block_hash) + str(proof)).encode()
     guess_hash = hash_string_256(guess)
-    print(guess_hash)
+    # print(guess_hash)
     return guess_hash[:2] == '00'
 
 def proof_of_work():
@@ -82,7 +93,7 @@ def save_data():
 def block_mine():
     last_block = blockchain[-1]
     hashed_last_block = hash_block(last_block)
-    print(hashed_last_block)
+    # print(hashed_last_block)
     # reward_transaction = {
     #     'sender' : 'MINING',
     #     'receiver' : owner,
@@ -194,6 +205,7 @@ while True:
         
     elif user_choice == '2':
         if block_mine():
+            print('Mining successfull!!!')
             open_transactions = []
             save_data()
 
@@ -205,11 +217,7 @@ while True:
 
     elif user_choice == '5':
         if len(blockchain) > 0:
-            blockchain[0] = {
-                'previous_block_hash':'',
-                'index':0,
-                'transaction': {'sender': 'Sai', 'receiver': 'Max', 'amount':100}
-            }
+            blockchain[0]['proof'] = 2
 
     elif user_choice == '6':
         break
